@@ -1,18 +1,25 @@
 {
   "name": "ecommerce",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js.js",
+  "description": "MERN Stack E-commerce Backend",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "server": "nodemon server.js"
   },
   "keywords": [],
   "author": "Nageshwari",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "colors": "^1.4.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "mongoose": "^9.0.1",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.11"
   }
 }
