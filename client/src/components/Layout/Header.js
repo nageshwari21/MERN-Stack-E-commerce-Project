@@ -28,11 +28,7 @@ const Header = () => {
             <NavLink to="/" className="nav-link">Home</NavLink>
           </li>
 
-          <li className="nav-item">
-            <NavLink to="/category" className="nav-link">Category</NavLink>
-          </li>
-
-          {!auth?.user && (
+          {!auth?.user ? (
             <>
               <li className="nav-item">
                 <NavLink to="/register" className="nav-link">Register</NavLink>
@@ -41,16 +37,29 @@ const Header = () => {
                 <NavLink to="/login" className="nav-link">Login</NavLink>
               </li>
             </>
-          )}
-
-          {auth?.user && (
+          ) : (
             <>
               <li className="nav-item">
-                <NavLink to="/dashboard/user" className="nav-link">Dashboard</NavLink>
+                {auth.user.role === 1 ? (
+                  <NavLink to="/dashboard/admin" className="nav-link">
+                    Admin Dashboard
+                  </NavLink>
+                ) : (
+                  <NavLink to="/dashboard/user" className="nav-link">
+                    Dashboard
+                  </NavLink>
+                )}
               </li>
+
               <li className="nav-item">
-                <span className="nav-link fw-bold">{auth.user.name}</span>
+                <span className="nav-link fw-bold">
+                  {auth.user.name}{" "}
+                  {auth.user.role === 1 && (
+                    <span className="badge bg-danger ms-1">Admin</span>
+                  )}
+                </span>
               </li>
+
               <li className="nav-item">
                 <button
                   onClick={handleLogout}

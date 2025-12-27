@@ -1,47 +1,38 @@
 import { useEffect, useState } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/auth";
 
-export default function PrivateRoute() {
+const PrivateRoute = () => {
   const [auth] = useAuth();
   const [ok, setOk] = useState(false);
-  const [loading, setLoading] = useState(true); // ✅ ADD THIS
-  const location = useLocation();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const authCheck = async () => {
+    const checkAuth = async () => {
       try {
         const res = await axios.get("/api/v1/auth/user-auth", {
           headers: {
-            Authorization: auth?.token,
+            Authorization: `Bearer ${auth?.token}`,
           },
         });
-
-        if (res.data.ok) {
-          setOk(true);
-        } else {
-          setOk(false);
-        }
-      } catch (error) {
+        setOk(res.data.ok);
+      } catch (err) {
         setOk(false);
       } finally {
-        setLoading(false); // ✅ IMPORTANT
+        setLoading(false);
       }
     };
 
-    if (auth?.token) authCheck();
+    if (auth?.token) checkAuth();
     else setLoading(false);
   }, [auth?.token]);
 
-  // ⏳ WAIT until auth check completes
   if (loading) {
-    return <div className="text-center mt-5">Loading...</div>;
+    return <h3 className="text-center mt-5">Checking authentication...</h3>;
   }
 
-  return ok ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/login" state={{ from: location }} replace />
-  );
-}
+  return ok ? <Outlet /> : <h3 className="text-center mt-5">Please login</h3>;
+};
+
+export default PrivateRoute;
