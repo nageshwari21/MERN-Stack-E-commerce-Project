@@ -6,10 +6,10 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Policy from "./pages/Policy";
 import Pagenotfound from "./pages/Pagenotfound";
-
-/* 🛍️ Product pages */
-import Products from "./pages/Products";
+import Search from "./pages/Search";
 import ProductDetails from "./pages/ProductDetails";
+import Categories from "./pages/Categories";
+import CategoryProduct from "./pages/CategoryProduct";
 
 /* 🔐 Auth pages */
 import Register from "./pages/Auth/Register";
@@ -25,6 +25,8 @@ import Orders from "./pages/user/Orders";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import CreateCategory from "./pages/Admin/CreateCategory";
 import CreateProduct from "./pages/Admin/CreateProduct";
+import Products from "./pages/Admin/Products";
+import UpdateProduct from "./pages/Admin/UpdateProduct";
 import User from "./pages/Admin/User";
 
 /* 🔒 Route guards */
@@ -36,16 +38,20 @@ function App() {
     <Routes>
       {/* 🌍 PUBLIC ROUTES */}
       <Route path="/" element={<HomePage />} />
+      <Route path="/search" element={<Search />} />
+
+      {/* ✅ PRODUCT & CATEGORY */}
+      <Route path="/product/:slug" element={<ProductDetails />} />
+      <Route path="/categories" element={<Categories />} />
+      <Route path="/category/:slug" element={<CategoryProduct />} />
+
+      {/* 🔐 AUTH */}
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/policy" element={<Policy />} />
-
-      {/* 🛍️ PRODUCT ROUTES */}
-      <Route path="/products" element={<Products />} />
-      <Route path="/product/:slug" element={<ProductDetails />} />
 
       {/* 👤 USER DASHBOARD */}
       <Route path="/dashboard/user" element={<PrivateRoute />}>
@@ -59,6 +65,8 @@ function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="create-category" element={<CreateCategory />} />
         <Route path="create-product" element={<CreateProduct />} />
+        <Route path="products" element={<Products />} />
+        <Route path="update-product/:id" element={<UpdateProduct />} />
         <Route path="users" element={<User />} />
       </Route>
 

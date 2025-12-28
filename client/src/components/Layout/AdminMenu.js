@@ -22,6 +22,11 @@ const AdminMenu = () => {
         Create Product
       </NavLink>
 
+      {/* ✅ ALL PRODUCTS */}
+      <NavLink to="/dashboard/admin/products" className={linkClass}>
+        Products
+      </NavLink>
+
       {/* Users */}
       <NavLink to="/dashboard/admin/users" className={linkClass}>
         Users

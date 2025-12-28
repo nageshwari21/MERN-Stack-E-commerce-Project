@@ -1,5 +1,5 @@
+import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
-import Category from "../models/categoryModel.js";
 
 /* =========================
    CREATE CATEGORY
@@ -15,7 +15,10 @@ export const createCategoryController = async (req, res) => {
       });
     }
 
-    const existingCategory = await Category.findOne({ name });
+    // 🔥 FIX: check by slug, not name
+    const slug = slugify(name, { lower: true });
+
+    const existingCategory = await categoryModel.findOne({ slug });
     if (existingCategory) {
       return res.status(200).send({
         success: false,
@@ -23,9 +26,9 @@ export const createCategoryController = async (req, res) => {
       });
     }
 
-    const category = await new Category({
+    const category = await new categoryModel({
       name,
-      slug: slugify(name),
+      slug,
     }).save();
 
     res.status(201).send({
@@ -34,6 +37,7 @@ export const createCategoryController = async (req, res) => {
       category,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Error in creating category",
@@ -43,18 +47,50 @@ export const createCategoryController = async (req, res) => {
 };
 
 /* =========================
-   GET ALL CATEGORIES
+   UPDATE CATEGORY
 ========================= */
-export const getAllCategoryController = async (req, res) => {
+export const updateCategoryController = async (req, res) => {
   try {
-    const categories = await Category.find({}).sort({ createdAt: -1 });
+    const { name } = req.body;
+    const { id } = req.params;
+
+    const slug = slugify(name, { lower: true });
+
+    const category = await categoryModel.findByIdAndUpdate(
+      id,
+      { name, slug },
+      { new: true }
+    );
 
     res.status(200).send({
       success: true,
-      message: "All categories list",
-      categories,
+      message: "Category updated successfully",
+      category,
     });
   } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error while updating category",
+      error,
+    });
+  }
+};
+
+/* =========================
+   GET ALL CATEGORIES
+========================= */
+export const categoryController = async (req, res) => {
+  try {
+    const categories = await categoryModel.find({}).sort({ createdAt: -1 });
+
+    res.status(200).send({
+      success: true,
+      message: "All categories",
+      categories, // ✅ IMPORTANT
+    });
+  } catch (error) {
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Error while getting categories",
@@ -66,9 +102,9 @@ export const getAllCategoryController = async (req, res) => {
 /* =========================
    GET SINGLE CATEGORY
 ========================= */
-export const getSingleCategoryController = async (req, res) => {
+export const singleCategoryController = async (req, res) => {
   try {
-    const category = await Category.findOne({
+    const category = await categoryModel.findOne({
       slug: req.params.slug,
     });
 
@@ -81,43 +117,13 @@ export const getSingleCategoryController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Single category fetched",
       category,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Error while getting category",
-      error,
-    });
-  }
-};
-
-/* =========================
-   UPDATE CATEGORY
-========================= */
-export const updateCategoryController = async (req, res) => {
-  try {
-    const { name } = req.body;
-
-    const updatedCategory = await Category.findByIdAndUpdate(
-      req.params.id,
-      {
-        name,
-        slug: slugify(name),
-      },
-      { new: true }
-    );
-
-    res.status(200).send({
-      success: true,
-      message: "Category updated successfully",
-      updatedCategory,
-    });
-  } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: "Error while updating category",
       error,
     });
   }
@@ -128,13 +134,14 @@ export const updateCategoryController = async (req, res) => {
 ========================= */
 export const deleteCategoryController = async (req, res) => {
   try {
-    await Category.findByIdAndDelete(req.params.id);
+    await categoryModel.findByIdAndDelete(req.params.id);
 
     res.status(200).send({
       success: true,
       message: "Category deleted successfully",
     });
   } catch (error) {
+    console.log(error);
     res.status(500).send({
       success: false,
       message: "Error while deleting category",

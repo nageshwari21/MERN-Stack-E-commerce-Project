@@ -15,5 +15,5 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔴 THIS NAME MUST MATCH productModel ref
+// ✅ MUST be "Category"
 export default mongoose.model("Category", categorySchema);
