@@ -38,7 +38,7 @@ const UpdateProduct = () => {
 
         // FETCH CATEGORIES
         const catRes = await axios.get("/api/v1/category/get-category");
-        setCategories(catRes.data.category || []);
+        setCategories(catRes.data.categories || []);
       } catch (error) {
         console.error("Error fetching product:", error);
       }
@@ -47,6 +47,9 @@ const UpdateProduct = () => {
     fetchData();
   }, [id]);
 
+  /* =====================
+     UPDATE PRODUCT
+  ====================== */
   const handleUpdate = async (e) => {
     e.preventDefault();
 
@@ -74,6 +77,27 @@ const UpdateProduct = () => {
     }
   };
 
+  /* =====================
+     DELETE PRODUCT  ⭐ NEW
+  ====================== */
+  const handleDelete = async () => {
+    try {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this product?"
+      );
+
+      if (!confirmDelete) return;
+
+      await axios.delete(
+        `/api/v1/product/delete-product/${id}`
+      );
+
+      navigate("/dashboard/admin/products");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   return (
     <Layout title="Update Product">
       <div className="container-fluid mt-3">
@@ -81,6 +105,7 @@ const UpdateProduct = () => {
           <div className="col-md-3">
             <AdminMenu />
           </div>
+
           <div className="col-md-9">
             <h3>Update Product</h3>
 
@@ -162,9 +187,20 @@ const UpdateProduct = () => {
                 onChange={(e) => setPhoto(e.target.files[0])}
               />
 
-              <button className="btn btn-primary">
-                Update Product
-              </button>
+              {/* BUTTONS */}
+              <div className="d-flex gap-2">
+                <button className="btn btn-primary" type="submit">
+                  Update Product
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={handleDelete}
+                >
+                  Delete Product
+                </button>
+              </div>
             </form>
           </div>
         </div>
