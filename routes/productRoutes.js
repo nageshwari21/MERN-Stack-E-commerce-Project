@@ -1,52 +1,56 @@
 import express from "express";
-import formidable from "express-formidable";
-
 import {
   createProductController,
-  getAllProductController,
+  deleteProductController,
+  getProductController,
   getSingleProductController,
+  productCountController,
+  productFiltersController,
+  productListController,
   productPhotoController,
   updateProductController,
-  deleteProductController,
-  productFilterController,
-  productListController,
-  productCountController,
-  searchProductController,
-  productCategoryController, // ⭐ IMPORTANT
 } from "../controllers/productController.js";
+import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
+import formidable from "express-formidable";
 
 const router = express.Router();
 
-// CREATE PRODUCT
-router.post("/create-product", formidable(), createProductController);
+//routes
+router.post(
+  "/create-product",
+  requireSignIn,
+  isAdmin,
+  formidable(),
+  createProductController
+);
+//routes
+router.put(
+  "/update-product/:pid",
+  requireSignIn,
+  isAdmin,
+  formidable(),
+  updateProductController
+);
 
-// GET ALL PRODUCTS (ADMIN)
-router.get("/get-product", getAllProductController);
+//get products
+router.get("/get-product", getProductController);
 
-// GET SINGLE PRODUCT
-router.get("/single-product/:id", getSingleProductController);
+//single product
+router.get("/get-product/:slug", getSingleProductController);
 
-// PRODUCT PHOTO
+//get photo
 router.get("/product-photo/:pid", productPhotoController);
 
-// UPDATE PRODUCT
-router.put("/update-product/:id", formidable(), updateProductController);
+//delete rproduct
+router.delete("/delete-product/:pid", deleteProductController);
 
-// DELETE PRODUCT
-router.delete("/delete-product/:id", deleteProductController);
+//filter product
+router.post("/product-filters", productFiltersController);
 
-// HOME PAGE
-router.get("/product-list/:page", productListController);
-router.post("/product-filters", productFilterController);
+//product count
 router.get("/product-count", productCountController);
 
-// SEARCH
-router.get("/search/:keyword", searchProductController);
-
-// ⭐ CATEGORY → PRODUCTS (THIS WAS MISSING)
-router.get(
-  "/product-category/:slug",
-  productCategoryController
-);
+//product per page
+router.get("/product-list/:page", productListController);
 
 export default router;

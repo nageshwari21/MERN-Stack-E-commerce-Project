@@ -39,19 +39,17 @@ function App() {
       {/* 🌍 PUBLIC ROUTES */}
       <Route path="/" element={<HomePage />} />
       <Route path="/search" element={<Search />} />
-
-      {/* ✅ PRODUCT & CATEGORY */}
       <Route path="/product/:slug" element={<ProductDetails />} />
       <Route path="/categories" element={<Categories />} />
       <Route path="/category/:slug" element={<CategoryProduct />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/policy" element={<Policy />} />
 
       {/* 🔐 AUTH */}
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/policy" element={<Policy />} />
 
       {/* 👤 USER DASHBOARD */}
       <Route path="/dashboard/user" element={<PrivateRoute />}>

@@ -1,38 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../context/auth";
 import { Outlet } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../../context/auth";
+import Spinner from "../Spinner";
 
-const PrivateRoute = () => {
-  const [auth] = useAuth();
+export default function PrivateRoute() {
   const [ok, setOk] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [auth] = useAuth(); // ✅ fixed
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/v1/auth/user-auth", {
-          headers: {
-            Authorization: `Bearer ${auth?.token}`,
-          },
-        });
-        setOk(res.data.ok);
-      } catch (err) {
-        setOk(false);
-      } finally {
-        setLoading(false);
-      }
+    const authCheck = async () => {
+      const res = await axios.get("/api/v1/auth/user-auth", {
+        headers: {
+          Authorization: `Bearer ${auth?.token}`,
+        },
+      });
+
+      setOk(res.data.ok);
     };
 
-    if (auth?.token) checkAuth();
-    else setLoading(false);
+    if (auth?.token) authCheck();
   }, [auth?.token]);
 
-  if (loading) {
-    return <h3 className="text-center mt-5">Checking authentication...</h3>;
-  }
-
-  return ok ? <Outlet /> : <h3 className="text-center mt-5">Please login</h3>;
-};
-
-export default PrivateRoute;
+  return ok ? <Outlet /> : <Spinner />;
+}
