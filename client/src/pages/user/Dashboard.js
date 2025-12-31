@@ -1,3 +1,4 @@
+// src/pages/user/Dashboard.jsx
 import React from "react";
 import Layout from "../../components/Layout/Layout";
 import UserMenu from "../../components/Layout/UserMenu";
@@ -9,21 +10,30 @@ const Dashboard = () => {
   return (
     <Layout title="User Dashboard">
       <div className="container-fluid mt-4">
-        <h2 className="text-center">User Dashboard</h2>
-        <h5 className="text-center text-muted">
-          Welcome, {auth?.user?.name} 👋
-        </h5>
-
-        <div className="row mt-4">
+        <div className="row">
+          {/* LEFT MENU */}
           <div className="col-md-3">
             <UserMenu />
           </div>
 
+          {/* RIGHT CONTENT */}
           <div className="col-md-9">
-            <div className="card p-3">
-              <h5>User Info</h5>
-              <p><strong>Name:</strong> {auth.user.name}</p>
-              <p><strong>Email:</strong> {auth.user.email}</p>
+            <div className="card p-4 shadow">
+              <h3 className="mb-3">User Dashboard</h3>
+
+              <p>
+                <strong>Name:</strong> {auth?.user?.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {auth?.user?.email}
+              </p>
+              <p>
+                <strong>Role:</strong> User
+              </p>
+
+              <hr />
+
+              <p>Welcome to your dashboard 🎉</p>
             </div>
           </div>
         </div>

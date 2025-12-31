@@ -1,30 +1,40 @@
-import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+// src/components/Routes/AdminRoute.js
+import { useState, useEffect } from "react";
+import { Outlet, Navigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/auth";
+import Spinner from "../Spinner";
 
 const AdminRoute = () => {
-  const [auth] = useAuth();
   const [ok, setOk] = useState(false);
+  const [auth] = useAuth();
 
   useEffect(() => {
-    const checkAdmin = async () => {
+    const authCheck = async () => {
       try {
-        const res = await axios.get("/api/v1/auth/admin-auth", {
-          headers: {
-            Authorization: `Bearer ${auth?.token}`,
-          },
-        });
-        setOk(res.data.ok);
+        const { data } = await axios.get(
+          "/api/v1/auth/admin-auth",
+          {
+            headers: {
+              Authorization: auth?.token,
+            },
+          }
+        );
+        setOk(data?.ok);
       } catch (error) {
         setOk(false);
       }
     };
 
-    if (auth?.token) checkAdmin();
+    if (auth?.token) authCheck();
+    else setOk(false);
   }, [auth?.token]);
 
-  return ok ? <Outlet /> : null;
+  if (!auth?.token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return ok ? <Outlet /> : <Spinner />;
 };
 
 export default AdminRoute;

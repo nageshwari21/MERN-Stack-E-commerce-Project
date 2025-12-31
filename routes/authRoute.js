@@ -1,3 +1,4 @@
+// server/routes/authRoute.js
 import express from "express";
 import {
   registerController,
@@ -5,7 +6,7 @@ import {
   testController,
   forgotPasswordController,
 } from "../controllers/authController.js";
-import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
+import { requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -14,9 +15,6 @@ router.post("/register", registerController);
 
 // LOGIN
 router.post("/login", loginController);
-
-// TEST (ADMIN ONLY)
-router.get("/test", requireSignIn, isAdmin, testController);
 
 // FORGOT PASSWORD
 router.post("/forgot-password", forgotPasswordController);
@@ -30,5 +28,8 @@ router.get("/user-auth", requireSignIn, (req, res) => {
 router.get("/admin-auth", requireSignIn, isAdmin, (req, res) => {
   res.status(200).send({ ok: true });
 });
+
+// TEST (ADMIN ONLY)
+router.get("/test", requireSignIn, isAdmin, testController);
 
 export default router;

@@ -8,6 +8,9 @@ import { Prices } from "../components/Prices";
 const HomePage = () => {
   const navigate = useNavigate();
 
+  // =========================
+  // STATE
+  // =========================
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [checked, setChecked] = useState([]);
@@ -16,23 +19,23 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  /* =========================
-     GET ALL CATEGORIES
-  ========================= */
+  // =========================
+  // GET ALL CATEGORIES
+  // =========================
   const getAllCategory = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/v1/category/get-category");
       if (data?.success) {
-        setCategories(data?.categories || []);
+        setCategories(data.categories || []);
       }
     } catch (error) {
       console.log(error);
     }
   }, []);
 
-  /* =========================
-     GET TOTAL COUNT
-  ========================= */
+  // =========================
+  // GET TOTAL PRODUCT COUNT
+  // =========================
   const getTotal = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/v1/product/product-count");
@@ -42,9 +45,9 @@ const HomePage = () => {
     }
   }, []);
 
-  /* =========================
-     GET PRODUCTS
-  ========================= */
+  // =========================
+  // GET PRODUCTS (PAGE 1)
+  // =========================
   const getAllProducts = useCallback(async () => {
     try {
       setLoading(true);
@@ -59,9 +62,9 @@ const HomePage = () => {
     }
   }, [page]);
 
-  /* =========================
-     LOAD MORE
-  ========================= */
+  // =========================
+  // LOAD MORE PRODUCTS
+  // =========================
   const loadMore = useCallback(async () => {
     try {
       setLoading(true);
@@ -76,9 +79,9 @@ const HomePage = () => {
     }
   }, [page]);
 
-  /* =========================
-     FILTER PRODUCTS
-  ========================= */
+  // =========================
+  // FILTER PRODUCTS
+  // =========================
   const filterProduct = useCallback(async () => {
     try {
       const { data } = await axios.post(
@@ -91,15 +94,22 @@ const HomePage = () => {
     }
   }, [checked, radio]);
 
+  // =========================
+  // HANDLE CATEGORY FILTER
+  // =========================
   const handleFilter = (value, id) => {
     let all = [...checked];
-    value ? all.push(id) : (all = all.filter((c) => c !== id));
+    if (value) {
+      all.push(id);
+    } else {
+      all = all.filter((c) => c !== id);
+    }
     setChecked(all);
   };
 
-  /* =========================
-     EFFECTS
-  ========================= */
+  // =========================
+  // EFFECTS
+  // =========================
   useEffect(() => {
     getAllCategory();
     getTotal();
@@ -119,8 +129,11 @@ const HomePage = () => {
     }
   }, [checked, radio, filterProduct, getAllProducts]);
 
+  // =========================
+  // UI
+  // =========================
   return (
-    <Layout title={"All Products - Best Offers"}>
+    <Layout title="All Products - Best Offers">
       <div className="container-fluid row mt-3">
         {/* FILTER SECTION */}
         <div className="col-md-3">
@@ -129,9 +142,7 @@ const HomePage = () => {
           {categories.map((c) => (
             <Checkbox
               key={c._id}
-              onChange={(e) =>
-                handleFilter(e.target.checked, c._id)
-              }
+              onChange={(e) => handleFilter(e.target.checked, c._id)}
             >
               {c.name}
             </Checkbox>
@@ -148,7 +159,7 @@ const HomePage = () => {
           </Radio.Group>
         </div>
 
-        {/* PRODUCTS */}
+        {/* PRODUCTS SECTION */}
         <div className="col-md-9">
           <h1 className="text-center">All Products</h1>
 
@@ -165,6 +176,7 @@ const HomePage = () => {
                   alt={p.name}
                   height="200"
                 />
+
                 <div className="card-body">
                   <h5>{p.name}</h5>
                   <p>{p.description.substring(0, 30)}...</p>
