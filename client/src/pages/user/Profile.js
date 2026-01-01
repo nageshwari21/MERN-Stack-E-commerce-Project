@@ -1,146 +1,94 @@
-import React, { useState, useEffect } from "react";
-import UserMenu from "../../components/Layout/UserMenu";
+import { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import Layout from "../../components/Layout/Layout";
 import { useAuth } from "../../context/auth";
-import toast from "react-hot-toast";
-import axios from "axios";
 
 const Profile = () => {
   const [auth, setAuth] = useAuth();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(auth?.user?.name || "");
+  const [phone, setPhone] = useState(auth?.user?.phone || "");
+  const [address, setAddress] = useState(auth?.user?.address || "");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
 
-  // load user data
-  useEffect(() => {
-    if (auth?.user) {
-      const { name, email, phone, address } = auth.user;
-      setName(name || "");
-      setEmail(email || "");
-      setPhone(phone || "");
-      setAddress(address || "");
-    }
-  }, [auth?.user]);
-
-  // update profile
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // ✅ build payload carefully
-      const payload = {
-        name,
-        phone,
-        address,
-      };
-
-      // ✅ send password ONLY if user typed it
-      if (password && password.trim().length > 0) {
-        payload.password = password;
-      }
-
       const { data } = await axios.put(
         "/api/v1/auth/profile",
-        payload,
+        {
+          name,
+          phone,
+          address,
+          password,
+        },
         {
           headers: {
-            Authorization: auth?.token,
+            Authorization: `Bearer ${auth?.token}`, // ✅ REQUIRED
           },
         }
       );
 
-      if (data?.error) {
-        toast.error(data.error);
-      } else {
-        setAuth({ ...auth, user: data.updatedUser });
+      if (data?.success) {
+        toast.success("Profile updated");
 
-        // update localStorage
-        let ls = JSON.parse(localStorage.getItem("auth"));
-        ls.user = data.updatedUser;
-        localStorage.setItem("auth", JSON.stringify(ls));
+        // 🔥 update auth context + localStorage
+        const updatedAuth = {
+          ...auth,
+          user: data.updatedUser,
+        };
 
-        setPassword(""); // ✅ clear password field
-        toast.success("Profile & Password Updated Successfully");
+        setAuth(updatedAuth);
+        localStorage.setItem("auth", JSON.stringify(updatedAuth));
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error("Profile update failed");
     }
   };
 
   return (
-    <Layout title={"Your Profile"}>
-      <div className="container-fluid m-3 p-3">
-        <div className="row">
-          <div className="col-md-3">
-            <UserMenu />
-          </div>
+    <Layout title="Profile">
+      <div className="container mt-3">
+        <h3>User Profile</h3>
 
-          <div className="col-md-9">
-            <div className="form-container">
-              <form onSubmit={handleSubmit}>
-                <h4 className="title">USER PROFILE</h4>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className="form-control mb-2"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+          />
 
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="form-control"
-                    placeholder="Enter Your Name"
-                    autoFocus
-                  />
-                </div>
+          <input
+            type="text"
+            className="form-control mb-2"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Phone"
+          />
 
-                <div className="mb-3">
-                  <input
-                    type="email"
-                    value={email}
-                    className="form-control"
-                    disabled
-                  />
-                </div>
+          <input
+            type="text"
+            className="form-control mb-2"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Address"
+          />
 
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="form-control"
-                    placeholder="Enter New Password (optional)"
-                  />
-                </div>
+          <input
+            type="password"
+            className="form-control mb-2"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="New Password (optional)"
+          />
 
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="form-control"
-                    placeholder="Enter Your Phone"
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="form-control"
-                    placeholder="Enter Your Address"
-                  />
-                </div>
-
-                <button type="submit" className="btn btn-primary">
-                  UPDATE
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+          <button className="btn btn-primary">Update</button>
+        </form>
       </div>
     </Layout>
   );
