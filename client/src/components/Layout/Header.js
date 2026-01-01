@@ -3,9 +3,10 @@ import React from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { GiShoppingBag } from "react-icons/gi";
 import { Badge } from "antd";
+import toast from "react-hot-toast";
+
 import { useAuth } from "../../context/auth";
 import { useCart } from "../../context/cart";
-import toast from "react-hot-toast";
 import SearchInput from "../Form/SearchInput";
 import useCategory from "../../hooks/useCategory";
 
@@ -36,7 +37,9 @@ const Header = () => {
 
         <ul className="navbar-nav ms-auto align-items-center">
           <li className="nav-item">
-            <NavLink to="/" className="nav-link">Home</NavLink>
+            <NavLink to="/" className="nav-link">
+              Home
+            </NavLink>
           </li>
 
           <li className="nav-item dropdown">
@@ -48,7 +51,7 @@ const Header = () => {
               Categories
             </span>
             <ul className="dropdown-menu">
-              {categories.map((c) => (
+              {categories?.map((c) => (
                 <li key={c._id}>
                   <Link className="dropdown-item" to={`/category/${c.slug}`}>
                     {c.name}
@@ -60,24 +63,34 @@ const Header = () => {
 
           <li className="nav-item">
             <NavLink to="/cart" className="nav-link">
-              <Badge count={cart.length} showZero>🛒 Cart</Badge>
+              <Badge count={cart?.length} showZero>
+                🛒 Cart
+              </Badge>
             </NavLink>
           </li>
 
           {!auth?.user ? (
             <>
               <li className="nav-item">
-                <NavLink to="/register" className="nav-link">Register</NavLink>
+                <NavLink to="/register" className="nav-link">
+                  Register
+                </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink to="/login" className="nav-link">Login</NavLink>
+                <NavLink to="/login" className="nav-link">
+                  Login
+                </NavLink>
               </li>
             </>
           ) : (
             <>
               <li className="nav-item">
                 <NavLink
-                  to={auth.user.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
+                  to={
+                    Number(auth?.user?.role) === 1
+                      ? "/dashboard/admin"
+                      : "/dashboard/user"
+                  }
                   className="nav-link"
                 >
                   Dashboard
@@ -86,7 +99,7 @@ const Header = () => {
 
               <li className="nav-item">
                 <span className="nav-link fw-bold">
-                  {auth.user.name}
+                  {auth?.user?.name}
                 </span>
               </li>
 

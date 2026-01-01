@@ -28,13 +28,26 @@ const Profile = () => {
   // update profile
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      // ✅ build payload carefully
+      const payload = {
+        name,
+        phone,
+        address,
+      };
+
+      // ✅ send password ONLY if user typed it
+      if (password && password.trim().length > 0) {
+        payload.password = password;
+      }
+
       const { data } = await axios.put(
         "/api/v1/auth/profile",
-        { name, email, password, phone, address },
+        payload,
         {
           headers: {
-            Authorization: auth?.token, // ✅ VERY IMPORTANT
+            Authorization: auth?.token,
           },
         }
       );
@@ -45,12 +58,12 @@ const Profile = () => {
         setAuth({ ...auth, user: data.updatedUser });
 
         // update localStorage
-        let ls = localStorage.getItem("auth");
-        ls = JSON.parse(ls);
+        let ls = JSON.parse(localStorage.getItem("auth"));
         ls.user = data.updatedUser;
         localStorage.setItem("auth", JSON.stringify(ls));
 
-        toast.success("Profile Updated Successfully");
+        setPassword(""); // ✅ clear password field
+        toast.success("Profile & Password Updated Successfully");
       }
     } catch (error) {
       console.log(error);
@@ -87,7 +100,6 @@ const Profile = () => {
                     type="email"
                     value={email}
                     className="form-control"
-                    placeholder="Enter Your Email"
                     disabled
                   />
                 </div>
@@ -98,7 +110,7 @@ const Profile = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="form-control"
-                    placeholder="Enter New Password"
+                    placeholder="Enter New Password (optional)"
                   />
                 </div>
 

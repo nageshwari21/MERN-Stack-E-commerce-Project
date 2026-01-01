@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 
-/* 🌍 Public pages */
+/* Public */
 import HomePage from "./pages/HomePage";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -12,17 +12,17 @@ import Categories from "./pages/Categories";
 import CategoryProduct from "./pages/CategoryProduct";
 import CartPage from "./pages/CartPage";
 
-/* 🔐 Auth pages */
+/* Auth */
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 
-/* 👤 User pages */
+/* User */
 import Dashboard from "./pages/user/Dashboard";
 import Profile from "./pages/user/Profile";
 import Orders from "./pages/user/Orders";
 
-/* 🛡️ Admin pages */
+/* Admin */
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import CreateCategory from "./pages/Admin/CreateCategory";
 import CreateProduct from "./pages/Admin/CreateProduct";
@@ -30,14 +30,14 @@ import Products from "./pages/Admin/Products";
 import UpdateProduct from "./pages/Admin/UpdateProduct";
 import User from "./pages/Admin/User";
 
-/* 🔒 Route guards */
+/* Guards */
 import PrivateRoute from "./components/Routes/Private";
 import AdminRoute from "./components/Routes/AdminRoute";
 
 function App() {
   return (
     <Routes>
-      {/* 🌍 PUBLIC ROUTES */}
+      {/* PUBLIC */}
       <Route path="/" element={<HomePage />} />
       <Route path="/search" element={<Search />} />
       <Route path="/product/:slug" element={<ProductDetails />} />
@@ -48,29 +48,29 @@ function App() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/policy" element={<Policy />} />
 
-      {/* 🔐 AUTH ROUTES */}
+      {/* AUTH */}
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* 👤 USER DASHBOARD */}
-      <Route path="/dashboard" element={<PrivateRoute />}>
-        <Route path="user" element={<Dashboard />} />
-        <Route path="user/profile" element={<Profile />} />
-        <Route path="user/orders" element={<Orders />} />
+      {/* USER DASHBOARD */}
+      <Route path="/dashboard/user" element={<PrivateRoute />}>
+        <Route index element={<Dashboard />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="orders" element={<Orders />} />
       </Route>
 
-      {/* 🛡️ ADMIN DASHBOARD */}
-      <Route path="/dashboard" element={<AdminRoute />}>
-        <Route path="admin" element={<AdminDashboard />} />
-        <Route path="admin/create-category" element={<CreateCategory />} />
-        <Route path="admin/create-product" element={<CreateProduct />} />
-        <Route path="admin/products" element={<Products />} />
-        <Route path="admin/update-product/:id" element={<UpdateProduct />} />
-        <Route path="admin/users" element={<User />} />
+      {/* ADMIN DASHBOARD */}
+      <Route path="/dashboard/admin" element={<AdminRoute />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="create-category" element={<CreateCategory />} />
+        <Route path="create-product" element={<CreateProduct />} />
+        <Route path="products" element={<Products />} />
+        <Route path="update-product/:id" element={<UpdateProduct />} />
+        <Route path="users" element={<User />} />
       </Route>
 
-      {/* ❌ 404 */}
+      {/* 404 */}
       <Route path="*" element={<Pagenotfound />} />
     </Routes>
   );

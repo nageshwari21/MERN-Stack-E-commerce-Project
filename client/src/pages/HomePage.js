@@ -2,11 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Checkbox, Radio } from "antd";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 import Layout from "../components/Layout/Layout";
 import { Prices } from "../components/Prices";
+import { useCart } from "../context/cart";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [cart, setCart] = useCart(); // ✅ CART HOOK
 
   // =========================
   // STATE
@@ -46,7 +50,7 @@ const HomePage = () => {
   }, []);
 
   // =========================
-  // GET PRODUCTS (PAGE 1)
+  // GET PRODUCTS
   // =========================
   const getAllProducts = useCallback(async () => {
     try {
@@ -63,7 +67,7 @@ const HomePage = () => {
   }, [page]);
 
   // =========================
-  // LOAD MORE PRODUCTS
+  // LOAD MORE
   // =========================
   const loadMore = useCallback(async () => {
     try {
@@ -99,11 +103,8 @@ const HomePage = () => {
   // =========================
   const handleFilter = (value, id) => {
     let all = [...checked];
-    if (value) {
-      all.push(id);
-    } else {
-      all = all.filter((c) => c !== id);
-    }
+    if (value) all.push(id);
+    else all = all.filter((c) => c !== id);
     setChecked(all);
   };
 
@@ -122,11 +123,8 @@ const HomePage = () => {
   }, [page, loadMore]);
 
   useEffect(() => {
-    if (!checked.length && !radio.length) {
-      getAllProducts();
-    } else {
-      filterProduct();
-    }
+    if (!checked.length && !radio.length) getAllProducts();
+    else filterProduct();
   }, [checked, radio, filterProduct, getAllProducts]);
 
   // =========================
@@ -184,13 +182,19 @@ const HomePage = () => {
 
                   <button
                     className="btn btn-primary ms-1"
-                    disabled={!p.slug}
                     onClick={() => navigate(`/product/${p.slug}`)}
                   >
                     More Details
                   </button>
 
-                  <button className="btn btn-secondary ms-1">
+                  {/* ✅ FIXED ADD TO CART */}
+                  <button
+                    className="btn btn-secondary ms-1"
+                    onClick={() => {
+                      setCart([...cart, p]);
+                      toast.success("Added to cart");
+                    }}
+                  >
                     Add to Cart
                   </button>
                 </div>

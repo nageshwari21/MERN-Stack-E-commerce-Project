@@ -1,10 +1,10 @@
-// server/routes/authRoute.js
 import express from "express";
 import {
   registerController,
   loginController,
   testController,
   forgotPasswordController,
+  updateProfileController,
 } from "../controllers/authController.js";
 import { requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
 
@@ -28,6 +28,9 @@ router.get("/user-auth", requireSignIn, (req, res) => {
 router.get("/admin-auth", requireSignIn, isAdmin, (req, res) => {
   res.status(200).send({ ok: true });
 });
+
+// UPDATE PROFILE
+router.put("/profile", requireSignIn, updateProfileController);
 
 // TEST (ADMIN ONLY)
 router.get("/test", requireSignIn, isAdmin, testController);
