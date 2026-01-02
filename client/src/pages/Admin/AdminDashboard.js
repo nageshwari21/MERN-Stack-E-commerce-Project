@@ -11,7 +11,7 @@ const AdminDashboard = () => {
       <div className="container-fluid mt-4">
         <h2 className="mb-2 text-center">Admin Dashboard</h2>
 
-        {/* ✅ Welcome Message */}
+        {/* Welcome Message */}
         <h4 className="text-center text-muted mb-4">
           Welcome to Admin Dashboard, {auth?.user?.name} 👋
         </h4>
@@ -33,9 +33,11 @@ const AdminDashboard = () => {
                 <p>
                   <strong>Name:</strong> {auth.user.name}
                 </p>
+
                 <p>
                   <strong>Email:</strong> {auth.user.email}
                 </p>
+
                 <p>
                   <strong>Role:</strong>{" "}
                   {auth.user.role === 1 ? "Admin (role: 1)" : "User"}

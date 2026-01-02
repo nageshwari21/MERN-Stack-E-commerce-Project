@@ -10,11 +10,8 @@ import { useCart } from "../context/cart";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [cart, setCart] = useCart(); // ✅ CART HOOK
+  const [cart, setCart] = useCart(); 
 
-  // =========================
-  // STATE
-  // =========================
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [checked, setChecked] = useState([]);

@@ -3,11 +3,15 @@ import Layout from "../../components/Layout/Layout";
 import AdminMenu from "../../components/Layout/AdminMenu";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/auth";
+import toast from "react-hot-toast";
 
 const UpdateProduct = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // product _id
   const navigate = useNavigate();
+  const [auth] = useAuth();
 
+  // ================= STATES =================
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -18,38 +22,51 @@ const UpdateProduct = () => {
   const [photo, setPhoto] = useState(null);
   const [productId, setProductId] = useState("");
 
+  // ================= FETCH PRODUCT =================
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // FETCH PRODUCT BY ID
         const { data } = await axios.get(
-          `/api/v1/product/single-product/${id}`
+          `/api/v1/product/single-product/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth?.token}`,
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+            },
+          }
         );
 
         const product = data.product;
 
         setProductId(product._id);
-        setName(product.name);
-        setDescription(product.description);
-        setPrice(product.price);
-        setQuantity(product.quantity);
-        setShipping(product.shipping);
-        setCategory(product.category._id);
+        setName(product.name || "");
+        setDescription(product.description || "");
+        setPrice(product.price || "");
+        setQuantity(product.quantity || "");
+        setShipping(product.shipping === true || product.shipping === 1);
+        setCategory(
+          typeof product.category === "object"
+            ? product.category._id
+            : product.category
+        );
 
-        // FETCH CATEGORIES
-        const catRes = await axios.get("/api/v1/category/get-category");
+        const catRes = await axios.get(
+          "/api/v1/category/get-category",
+          { headers: { "Cache-Control": "no-cache" } }
+        );
+
         setCategories(catRes.data.categories || []);
       } catch (error) {
-        console.error("Error fetching product:", error);
+        console.error(error);
+        toast.error("Failed to load product");
       }
     };
 
-    fetchData();
-  }, [id]);
+    if (id && auth?.token) fetchData();
+  }, [id, auth?.token]);
 
-  /* =====================
-     UPDATE PRODUCT
-  ====================== */
+  // ================= UPDATE PRODUCT =================
   const handleUpdate = async (e) => {
     e.preventDefault();
 
@@ -62,42 +79,57 @@ const UpdateProduct = () => {
       productData.append("quantity", quantity);
       productData.append("shipping", shipping);
 
-      if (photo) {
-        productData.append("photo", photo);
-      }
+      if (photo) productData.append("photo", photo);
 
-      await axios.put(
+      const { data } = await axios.put(
         `/api/v1/product/update-product/${id}`,
-        productData
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`,
+            "Content-Type": "multipart/form-data", // 🔥 REQUIRED
+          },
+        }
       );
 
-      navigate("/dashboard/admin/products");
+      if (data?.success) {
+        toast.success("Product Updated Successfully");
+        navigate("/dashboard/admin/products");
+      } else {
+        toast.error("Update failed");
+      }
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error(error);
+      toast.error("Update error");
     }
   };
 
-  /* =====================
-     DELETE PRODUCT  ⭐ NEW
-  ====================== */
+  // ================= DELETE PRODUCT =================
   const handleDelete = async () => {
     try {
       const confirmDelete = window.confirm(
         "Are you sure you want to delete this product?"
       );
-
       if (!confirmDelete) return;
 
       await axios.delete(
-        `/api/v1/product/delete-product/${id}`
+        `/api/v1/product/delete-product/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`,
+          },
+        }
       );
 
+      toast.success("Product Deleted");
       navigate("/dashboard/admin/products");
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error(error);
+      toast.error("Delete failed");
     }
   };
 
+  // ================= UI =================
   return (
     <Layout title="Update Product">
       <div className="container-fluid mt-3">
@@ -187,7 +219,6 @@ const UpdateProduct = () => {
                 onChange={(e) => setPhoto(e.target.files[0])}
               />
 
-              {/* BUTTONS */}
               <div className="d-flex gap-2">
                 <button className="btn btn-primary" type="submit">
                   Update Product
@@ -202,6 +233,7 @@ const UpdateProduct = () => {
                 </button>
               </div>
             </form>
+
           </div>
         </div>
       </div>
