@@ -15,7 +15,7 @@ import { requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// CREATE
+
 router.post(
   "/create-product",
   requireSignIn,
@@ -44,13 +44,12 @@ router.delete(
 // GET ALL
 router.get("/get-product", getProductController);
 
-// GET SINGLE (ADMIN / UPDATE PAGE)
+
 router.get("/single-product/:pid", getSingleProductController);
 
 // PHOTO
 router.get("/product-photo/:pid", productPhotoController);
 
-// FILTER
 router.post("/product-filters", productFiltersController);
 
 // COUNT
