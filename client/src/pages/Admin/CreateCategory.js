@@ -6,20 +6,14 @@ import { useAuth } from "../../context/auth";
 
 const CreateCategory = () => {
   const [auth] = useAuth();
-
   const [name, setName] = useState("");
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
-  // ======================
-  // GET ALL CATEGORIES
-  // ======================
   const getAllCategories = async () => {
     try {
-      const { data } = await axios.get(
-        "/api/v1/category/get-category"
-      );
-      setCategories(data.categories);
+      const { data } = await axios.get("/api/v1/category/get-category");
+      setCategories(data.categories);   // 🔥 FIXED
     } catch (error) {
       console.log(error);
     }
@@ -29,41 +23,26 @@ const CreateCategory = () => {
     getAllCategories();
   }, []);
 
-  // ======================
-  // CREATE OR UPDATE
-  // ======================
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       if (editingId) {
-        // 🔵 UPDATE
-        const { data } = await axios.put(
+        await axios.put(
           `/api/v1/category/update-category/${editingId}`,
           { name },
           {
-            headers: {
-              Authorization: `Bearer ${auth?.token}`,
-            },
+            headers: { Authorization: `Bearer ${auth?.token}` },
           }
         );
-
-        alert(data.message);
       } else {
-        // 🟢 CREATE
-        const { data } = await axios.post(
+        await axios.post(
           "/api/v1/category/create-category",
           { name },
           {
-            headers: {
-              Authorization: `Bearer ${auth?.token}`,
-            },
+            headers: { Authorization: `Bearer ${auth?.token}` },
           }
         );
-
-        alert(data.message);
       }
-
       setName("");
       setEditingId(null);
       getAllCategories();
@@ -73,29 +52,17 @@ const CreateCategory = () => {
     }
   };
 
-  // ======================
-  // EDIT BUTTON
-  // ======================
   const handleEdit = (cat) => {
     setName(cat.name);
     setEditingId(cat._id);
   };
 
-  // ======================
-  // DELETE
-  // ======================
   const handleDelete = async (id) => {
     if (!window.confirm("Delete category?")) return;
-
     try {
-      await axios.delete(
-        `/api/v1/category/delete-category/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${auth?.token}`,
-          },
-        }
-      );
+      await axios.delete(`/api/v1/category/delete-category/${id}`, {
+        headers: { Authorization: `Bearer ${auth?.token}` },
+      });
       getAllCategories();
     } catch (error) {
       console.log(error);

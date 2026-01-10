@@ -16,7 +16,6 @@ const gateway = new braintree.BraintreeGateway({
     process.env.NODE_ENV === "production"
       ? braintree.Environment.Production
       : braintree.Environment.Sandbox,
-
   merchantId: process.env.BRAINTREE_MERCHANT_ID,
   publicKey: process.env.BRAINTREE_PUBLIC_KEY,
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
@@ -27,11 +26,12 @@ const gateway = new braintree.BraintreeGateway({
 ========================= */
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity, shipping } = req.fields;
+    const { name, description, price, category, quantity } = req.fields;
     const { photo } = req.files;
 
-    if (!name || !description || !price || !category || !quantity)
+    if (!name || !description || !price || !category || !quantity) {
       return res.status(400).send({ success: false, message: "All fields required" });
+    }
 
     const product = new productModel({
       ...req.fields,
@@ -44,11 +44,7 @@ export const createProductController = async (req, res) => {
     }
 
     await product.save();
-    res.status(201).send({
-      success: true,
-      message: "Product created successfully",
-      product,
-    });
+    res.status(201).send({ success: true, product });
   } catch (error) {
     res.status(500).send({ success: false, error });
   }
@@ -59,12 +55,7 @@ export const createProductController = async (req, res) => {
 ========================= */
 export const getProductController = async (req, res) => {
   try {
-    const products = await productModel
-      .find({})
-      .populate("category")
-      .select("-photo")
-      .sort({ createdAt: -1 });
-
+    const products = await productModel.find({}).populate("category").select("-photo");
     res.status(200).send({ success: true, products });
   } catch (error) {
     res.status(500).send({ success: false, error });
@@ -72,14 +63,22 @@ export const getProductController = async (req, res) => {
 };
 
 /* =========================
-   GET SINGLE PRODUCT
+   GET SINGLE PRODUCT (ID OR SLUG) 🔥 FIXED
 ========================= */
 export const getSingleProductController = async (req, res) => {
   try {
-    const product = await productModel
-      .findOne({ slug: req.params.slug })
-      .select("-photo")
-      .populate("category");
+    let product;
+
+    // If MongoDB ID
+    if (req.params.slug.match(/^[0-9a-fA-F]{24}$/)) {
+      product = await productModel.findById(req.params.slug).populate("category");
+    } else {
+      product = await productModel.findOne({ slug: req.params.slug }).populate("category");
+    }
+
+    if (!product) {
+      return res.status(404).send({ success: false, message: "Product not found" });
+    }
 
     res.status(200).send({ success: true, product });
   } catch (error) {
@@ -97,18 +96,6 @@ export const productPhotoController = async (req, res) => {
       res.set("Content-Type", product.photo.contentType);
       return res.send(product.photo.data);
     }
-  } catch (error) {
-    res.status(500).send({ success: false, error });
-  }
-};
-
-/* =========================
-   DELETE PRODUCT
-========================= */
-export const deleteProductController = async (req, res) => {
-  try {
-    await productModel.findByIdAndDelete(req.params.pid);
-    res.status(200).send({ success: true, message: "Product deleted" });
   } catch (error) {
     res.status(500).send({ success: false, error });
   }
@@ -133,11 +120,19 @@ export const updateProductController = async (req, res) => {
     }
 
     await product.save();
-    res.status(200).send({
-      success: true,
-      message: "Product updated",
-      product,
-    });
+    res.status(200).send({ success: true, product });
+  } catch (error) {
+    res.status(500).send({ success: false, error });
+  }
+};
+
+/* =========================
+   DELETE PRODUCT
+========================= */
+export const deleteProductController = async (req, res) => {
+  try {
+    await productModel.findByIdAndDelete(req.params.pid);
+    res.status(200).send({ success: true });
   } catch (error) {
     res.status(500).send({ success: false, error });
   }
@@ -151,13 +146,13 @@ export const productFiltersController = async (req, res) => {
     const { checked, radio } = req.body;
     let args = {};
 
-    if (checked?.length) args.category = checked;
-    if (radio?.length) args.price = { $gte: radio[0], $lte: radio[1] };
+    if (checked.length > 0) args.category = checked;
+    if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
 
     const products = await productModel.find(args).select("-photo");
     res.status(200).send({ success: true, products });
   } catch (error) {
-    res.status(400).send({ success: false, error });
+    res.status(500).send({ success: false, error });
   }
 };
 
@@ -169,12 +164,12 @@ export const productCountController = async (req, res) => {
     const total = await productModel.estimatedDocumentCount();
     res.status(200).send({ success: true, total });
   } catch (error) {
-    res.status(400).send({ success: false, error });
+    res.status(500).send({ success: false, error });
   }
 };
 
 /* =========================
-   PRODUCT LIST (PAGINATION)
+   PRODUCT LIST
 ========================= */
 export const productListController = async (req, res) => {
   try {
@@ -185,12 +180,45 @@ export const productListController = async (req, res) => {
       .find({})
       .select("-photo")
       .skip((page - 1) * perPage)
-      .limit(perPage)
-      .sort({ createdAt: -1 });
+      .limit(perPage);
 
     res.status(200).send({ success: true, products });
   } catch (error) {
-    res.status(400).send({ success: false, error });
+    res.status(500).send({ success: false, error });
+  }
+};
+
+/* =========================
+   PRODUCTS BY CATEGORY
+========================= */
+export const getProductByCategoryController = async (req, res) => {
+  try {
+    const category = await categoryModel.findOne({ slug: req.params.slug });
+    const products = await productModel.find({ category }).select("-photo");
+
+    res.status(200).send({ success: true, products, category });
+  } catch (error) {
+    res.status(500).send({ success: false, error });
+  }
+};
+
+/* =========================
+   SEARCH PRODUCTS
+========================= */
+export const searchProductController = async (req, res) => {
+  try {
+    const keyword = req.params.keyword;
+
+    const results = await productModel.find({
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    });
+
+    res.status(200).send(results);
+  } catch (error) {
+    res.status(500).send(error);
   }
 };
 
@@ -205,15 +233,15 @@ export const braintreeTokenController = (req, res) => {
 };
 
 /* =========================
-   BRAINTREE PAYMENT  ✅ FIXED
+   BRAINTREE PAYMENT
 ========================= */
 export const brainTreePaymentController = async (req, res) => {
   try {
     const { nonce, cart } = req.body;
     let total = 0;
 
-    cart.forEach((item) => {
-      total += item.price * item.quantity;
+    cart.forEach((i) => {
+      total += i.price * (i.quantity || 1);
     });
 
     gateway.transaction.sale(
@@ -222,17 +250,17 @@ export const brainTreePaymentController = async (req, res) => {
         paymentMethodNonce: nonce,
         options: { submitForSettlement: true },
       },
-      async (error, result) => {
-        if (result?.success) {
+      async (err, result) => {
+        if (result.success) {
           await new orderModel({
-            products: cart.map((i) => i._id),   // 🔥 FIX
+            products: cart.map((i) => i._id),
             payment: result,
             buyer: req.user._id,
           }).save();
 
           res.json({ ok: true });
         } else {
-          res.status(500).send(result?.message || "Payment failed");
+          res.status(500).send(result.message);
         }
       }
     );
