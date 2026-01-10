@@ -26,15 +26,23 @@ const gateway = new braintree.BraintreeGateway({
 ========================= */
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity } = req.fields;
+    const { name, description, price, category, quantity, shipping } = req.fields;
     const { photo } = req.files;
 
     if (!name || !description || !price || !category || !quantity) {
-      return res.status(400).send({ success: false, message: "All fields required" });
+      return res.status(400).send({
+        success: false,
+        message: "All fields are required",
+      });
     }
 
     const product = new productModel({
-      ...req.fields,
+      name,
+      description,
+      price,
+      category,
+      quantity,
+      shipping: shipping === "true" || shipping === "1",
       slug: slugify(name),
     });
 
@@ -44,8 +52,14 @@ export const createProductController = async (req, res) => {
     }
 
     await product.save();
-    res.status(201).send({ success: true, product });
+
+    res.status(201).send({
+      success: true,
+      message: "Product created successfully",
+      product,
+    });
   } catch (error) {
+    console.log("CREATE PRODUCT ERROR:", error);
     res.status(500).send({ success: false, error });
   }
 };
@@ -55,7 +69,10 @@ export const createProductController = async (req, res) => {
 ========================= */
 export const getProductController = async (req, res) => {
   try {
-    const products = await productModel.find({}).populate("category").select("-photo");
+    const products = await productModel
+      .find({})
+      .populate("category")
+      .select("-photo");
     res.status(200).send({ success: true, products });
   } catch (error) {
     res.status(500).send({ success: false, error });
@@ -63,25 +80,30 @@ export const getProductController = async (req, res) => {
 };
 
 /* =========================
-   GET SINGLE PRODUCT (ID OR SLUG) 🔥 FIXED
+   GET SINGLE PRODUCT (ID OR SLUG)
 ========================= */
 export const getSingleProductController = async (req, res) => {
   try {
     let product;
 
-    // If MongoDB ID
     if (req.params.slug.match(/^[0-9a-fA-F]{24}$/)) {
       product = await productModel.findById(req.params.slug).populate("category");
     } else {
-      product = await productModel.findOne({ slug: req.params.slug }).populate("category");
+      product = await productModel
+        .findOne({ slug: req.params.slug })
+        .populate("category");
     }
 
     if (!product) {
-      return res.status(404).send({ success: false, message: "Product not found" });
+      return res.status(404).send({
+        success: false,
+        message: "Product not found",
+      });
     }
 
     res.status(200).send({ success: true, product });
   } catch (error) {
+    console.log("GET SINGLE ERROR:", error);
     res.status(500).send({ success: false, error });
   }
 };
@@ -91,7 +113,9 @@ export const getSingleProductController = async (req, res) => {
 ========================= */
 export const productPhotoController = async (req, res) => {
   try {
-    const product = await productModel.findById(req.params.pid).select("photo");
+    const product = await productModel
+      .findById(req.params.pid)
+      .select("photo");
     if (product?.photo?.data) {
       res.set("Content-Type", product.photo.contentType);
       return res.send(product.photo.data);
@@ -102,26 +126,54 @@ export const productPhotoController = async (req, res) => {
 };
 
 /* =========================
-   UPDATE PRODUCT
+   UPDATE PRODUCT (🔥 FIXED)
 ========================= */
 export const updateProductController = async (req, res) => {
   try {
-    const { name } = req.fields;
+    const { name, description, price, category, quantity, shipping } = req.fields;
+    const { photo } = req.files;
+
+    if (!name || !price || !category || !quantity) {
+      return res.status(400).send({
+        success: false,
+        message: "All required fields must be filled",
+      });
+    }
 
     const product = await productModel.findByIdAndUpdate(
       req.params.pid,
-      { ...req.fields, slug: slugify(name) },
+      {
+        name,
+        description,
+        price,
+        category,
+        quantity,
+        shipping: shipping === "true" || shipping === "1",
+        slug: slugify(name),
+      },
       { new: true }
     );
 
-    if (req.files?.photo) {
-      product.photo.data = fs.readFileSync(req.files.photo.path);
-      product.photo.contentType = req.files.photo.type;
+    if (!product) {
+      return res.status(404).send({
+        success: false,
+        message: "Product not found",
+      });
     }
 
-    await product.save();
-    res.status(200).send({ success: true, product });
+    if (photo) {
+      product.photo.data = fs.readFileSync(photo.path);
+      product.photo.contentType = photo.type;
+      await product.save();
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Product updated successfully",
+      product,
+    });
   } catch (error) {
+    console.log("UPDATE ERROR:", error);
     res.status(500).send({ success: false, error });
   }
 };
@@ -194,7 +246,9 @@ export const productListController = async (req, res) => {
 export const getProductByCategoryController = async (req, res) => {
   try {
     const category = await categoryModel.findOne({ slug: req.params.slug });
-    const products = await productModel.find({ category }).select("-photo");
+    const products = await productModel
+      .find({ category })
+      .select("-photo");
 
     res.status(200).send({ success: true, products, category });
   } catch (error) {
@@ -257,7 +311,6 @@ export const brainTreePaymentController = async (req, res) => {
             payment: result,
             buyer: req.user._id,
           }).save();
-
           res.json({ ok: true });
         } else {
           res.status(500).send(result.message);

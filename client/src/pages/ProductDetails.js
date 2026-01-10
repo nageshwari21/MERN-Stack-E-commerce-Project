@@ -1,52 +1,36 @@
 import React, { useState, useEffect } from "react";
-import Layout from "./../components/Layout/Layout";
+import Layout from "../components/Layout/Layout";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/ProductDetailsStyles.css";
 
 const ProductDetails = () => {
-  const { slug } = useParams(); // ✅ use slug directly
+  const { slug } = useParams();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /* =========================
-     LOAD PRODUCT WHEN SLUG CHANGES
-  ========================= */
   useEffect(() => {
     const getProduct = async () => {
       try {
         setLoading(true);
-
         const { data } = await axios.get(
-          `/api/v1/product/get-product/${slug}`
+          `/api/v1/product/single-product/${slug}`
         );
-
         setProduct(data?.product);
-
-        // load similar products
-        getSimilarProduct(
-          data?.product?._id,
-          data?.product?.category?._id
-        );
-
+        getSimilarProduct(data?.product?._id, data?.product?.category?._id);
         setLoading(false);
       } catch (error) {
-        setLoading(false);
         console.log(error);
+        setLoading(false);
       }
     };
 
-    if (slug) {
-      getProduct();
-    }
-  }, [slug]); // ✅ MOST IMPORTANT FIX
+    if (slug) getProduct();
+  }, [slug]);
 
-  /* =========================
-     GET SIMILAR PRODUCTS
-  ========================= */
   const getSimilarProduct = async (pid, cid) => {
     try {
       const { data } = await axios.get(
@@ -58,77 +42,49 @@ const ProductDetails = () => {
     }
   };
 
-  /* =========================
-     LOADING STATE
-  ========================= */
   if (loading) {
     return (
       <Layout>
-        <h3 className="text-center mt-5">
-          Loading product details...
-        </h3>
+        <h3 className="text-center mt-5">Loading product...</h3>
       </Layout>
     );
   }
 
-  /* =========================
-     SAFETY CHECK
-  ========================= */
   if (!product) {
     return (
       <Layout>
-        <h3 className="text-center mt-5">
-          Product not found
-        </h3>
+        <h3 className="text-center mt-5">Product not found</h3>
       </Layout>
     );
   }
 
   return (
-    <Layout>
-      {/* ================= PRODUCT DETAILS ================= */}
+    <Layout title={product.name}>
       <div className="row container product-details">
         <div className="col-md-6">
           <img
             src={`/api/v1/product/product-photo/${product._id}`}
-            className="card-img-top"
             alt={product.name}
-            height="300"
-            width="350px"
+            className="img-fluid"
           />
         </div>
 
         <div className="col-md-6 product-details-info">
-          <h1 className="text-center">Product Details</h1>
-          <hr />
-          <h6>Name : {product.name}</h6>
-          <h6>Description : {product.description}</h6>
-          <h6>
-            Price :{" "}
-            {product.price.toLocaleString("en-US", {
-              style: "currency",
-              currency: "USD",
-            })}
-          </h6>
-          <h6>Category : {product?.category?.name}</h6>
-
-          {/* ✅ FIXED className */}
-          <button className="btn btn-secondary ms-1">
-            ADD TO CART
-          </button>
+          <h2>{product.name}</h2>
+          <p>{product.description}</p>
+          <h4>₹ {product.price}</h4>
+          <h5>Category : {product?.category?.name}</h5>
+          <button className="btn btn-primary">Add to Cart</button>
         </div>
       </div>
 
       <hr />
 
-      {/* ================= SIMILAR PRODUCTS ================= */}
       <div className="row container similar-products">
-        <h4>Similar Products ➡️</h4>
+        <h4>Similar Products</h4>
 
         {relatedProducts.length === 0 && (
-          <p className="text-center">
-            No Similar Products found
-          </p>
+          <p>No Similar Products Found</p>
         )}
 
         <div className="d-flex flex-wrap">
@@ -136,35 +92,18 @@ const ProductDetails = () => {
             <div className="card m-2" key={p._id}>
               <img
                 src={`/api/v1/product/product-photo/${p._id}`}
-                className="card-img-top"
                 alt={p.name}
+                className="card-img-top"
               />
               <div className="card-body">
-                <div className="card-name-price">
-                  <h5 className="card-title">{p.name}</h5>
-                  <h5 className="card-title card-price">
-                    {p.price.toLocaleString("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    })}
-                  </h5>
-                </div>
-
-                <p className="card-text">
-                  {p.description.substring(0, 60)}...
-                </p>
-
-                <div className="card-name-price">
-                  {/* ✅ THIS NOW WORKS 100% */}
-                  <button
-                    className="btn btn-info ms-1"
-                    onClick={() =>
-                      navigate(`/product/${p.slug}`)
-                    }
-                  >
-                    More Details
-                  </button>
-                </div>
+                <h5>{p.name}</h5>
+                <p>{p.description.substring(0, 50)}...</p>
+                <button
+                  className="btn btn-info"
+                  onClick={() => navigate(`/product/${p.slug}`)}
+                >
+                  More Details
+                </button>
               </div>
             </div>
           ))}

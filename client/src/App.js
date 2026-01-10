@@ -28,8 +28,8 @@ import CreateCategory from "./pages/Admin/CreateCategory";
 import CreateProduct from "./pages/Admin/CreateProduct";
 import Products from "./pages/Admin/Products";
 import UpdateProduct from "./pages/Admin/UpdateProduct";
-import User from "./pages/Admin/User";
-import AdminOrders from "./pages/Admin/AdminOrders";   // ✅ correct file
+import Users from "./pages/Admin/User";
+import AdminOrders from "./pages/Admin/AdminOrders";
 
 /* Guards */
 import PrivateRoute from "./components/Routes/Private";
@@ -38,7 +38,7 @@ import AdminRoute from "./components/Routes/AdminRoute";
 function App() {
   return (
     <Routes>
-      {/* PUBLIC */}
+      {/* ================= PUBLIC ================= */}
       <Route path="/" element={<HomePage />} />
       <Route path="/search" element={<Search />} />
       <Route path="/product/:slug" element={<ProductDetails />} />
@@ -49,32 +49,30 @@ function App() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/policy" element={<Policy />} />
 
-      {/* AUTH */}
+      {/* ================= AUTH ================= */}
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* USER DASHBOARD */}
+      {/* ================= USER DASHBOARD ================= */}
       <Route path="/dashboard/user" element={<PrivateRoute />}>
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
         <Route path="orders" element={<Orders />} />
       </Route>
 
-      {/* ADMIN DASHBOARD */}
+      {/* ================= ADMIN DASHBOARD ================= */}
       <Route path="/dashboard/admin" element={<AdminRoute />}>
         <Route index element={<AdminDashboard />} />
         <Route path="create-category" element={<CreateCategory />} />
         <Route path="create-product" element={<CreateProduct />} />
         <Route path="products" element={<Products />} />
         <Route path="update-product/:id" element={<UpdateProduct />} />
-        <Route path="users" element={<User />} />
-
-        {/* 🆕 ADMIN ORDERS */}
+        <Route path="users" element={<Users />} />
         <Route path="orders" element={<AdminOrders />} />
       </Route>
 
-      {/* 404 */}
+      {/* ================= 404 ================= */}
       <Route path="*" element={<Pagenotfound />} />
     </Routes>
   );
