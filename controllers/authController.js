@@ -29,11 +29,7 @@ export const registerController = async (req, res) => {
       password: hashed,
     }).save();
 
-    res.status(201).send({
-      success: true,
-      message: "Registered successfully",
-      user,
-    });
+    res.status(201).send({ success: true, message: "Registered successfully", user });
   } catch (error) {
     console.log(error);
     res.status(500).send({ success: false, error });
@@ -82,7 +78,6 @@ export const loginController = async (req, res) => {
 export const forgotPasswordController = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-
     const user = await userModel.findOne({ email });
     if (!user) return res.status(404).send({ success: false, message: "User not found" });
 
@@ -94,13 +89,6 @@ export const forgotPasswordController = async (req, res) => {
     console.log(error);
     res.status(500).send({ success: false, error });
   }
-};
-
-/* =========================
-   TEST CONTROLLER
-========================= */
-export const testController = (req, res) => {
-  res.send("Protected route working");
 };
 
 /* =========================
@@ -117,11 +105,7 @@ export const updateProfileController = async (req, res) => {
     if (address) user.address = address;
 
     await user.save();
-
-    res.status(200).send({
-      success: true,
-      user,
-    });
+    res.status(200).send({ success: true, user });
   } catch (error) {
     console.log(error);
     res.status(500).send({ success: false, error });
@@ -129,16 +113,51 @@ export const updateProfileController = async (req, res) => {
 };
 
 /* =========================
-   GET USER ORDERS
+   USER - MY ORDERS
 ========================= */
 export const getOrdersController = async (req, res) => {
   try {
     const orders = await orderModel
       .find({ buyer: req.user._id })
       .populate("products", "-photo")
-      .populate("buyer", "name");
+      .populate("buyer", "name email")
+      .sort({ createdAt: -1 });
 
-    res.status(200).json(orders);
+    res.status(200).send({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ success: false, error });
+  }
+};
+
+/* =========================
+   ADMIN - ALL ORDERS
+========================= */
+export const getAllOrdersController = async (req, res) => {
+  try {
+    const orders = await orderModel
+      .find({})
+      .populate("products", "-photo")
+      .populate("buyer", "name email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).send({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ success: false, error });
+  }
+};
+
+/* =========================
+   ADMIN - UPDATE STATUS
+========================= */
+export const updateOrderStatusController = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    const order = await orderModel.findByIdAndUpdate(orderId, { status }, { new: true });
+    res.status(200).send({ success: true, order });
   } catch (error) {
     console.log(error);
     res.status(500).send({ success: false, error });

@@ -4,14 +4,14 @@ const orderSchema = new mongoose.Schema(
   {
     products: [
       {
-        type: mongoose.ObjectId,
-        ref: "Products",
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
       },
     ],
     payment: {},
     buyer: {
-      type: mongoose.ObjectId,
-      ref: "users",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",   // now matches
     },
     status: {
       type: String,
