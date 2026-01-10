@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
+/* ================= GLOBAL ================= */
 * {
   margin: 0;
   padding: 0;
@@ -8,15 +9,18 @@
 }
 
 body {
-  background: linear-gradient(to right, #fff0f6, #eafff5);
-  color: #333;
+  background:
+    linear-gradient(rgba(255, 240, 246, 0.92), rgba(234, 255, 245, 0.92)),
+    url("https://images.unsplash.com/photo-1542291026-7eec264c27ff") center/cover fixed;
+  min-height: 100vh;
+  color: #222;
 }
 
-/* ================== NAVBAR ================== */
+/* ================= NAVBAR ================= */
 .navbar {
   background: linear-gradient(90deg, #ff5da2, #38d9a9);
   padding: 15px 30px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
 .navbar-brand {
@@ -35,7 +39,40 @@ body {
   color: #fff3bf !important;
 }
 
-/* ================== FOOTER ================== */
+/* ================= SEARCH BAR ================= */
+.search-form {
+  background: white;
+  padding: 10px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.search-form input {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 40px;
+  font-size: 16px;
+}
+
+.search-form button {
+  background: linear-gradient(90deg, #ff5da2, #38d9a9);
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.search-form button:hover {
+  transform: scale(1.08);
+}
+
+/* ================= FOOTER ================= */
 .footer {
   background: linear-gradient(90deg, #38d9a9, #ff5da2);
   color: white;
@@ -44,58 +81,43 @@ body {
   margin-top: 60px;
 }
 
-/* ================== HOME ================== */
-.home-container {
-  padding: 40px;
-}
-
+/* ================= PRODUCT GRID ================= */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 25px;
 }
 
-/* ================== PRODUCT CARD ================== */
-.product-card {
-  background: white;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  transition: 0.4s ease;
+/* ================= PRODUCT CARD ================= */
+.card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  transition: 0.4s;
+  border: none;
 }
 
-.product-card:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 18px 40px rgba(255,93,162,0.3);
+.card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(255,93,162,0.4);
 }
 
-.product-card img {
-  width: 100%;
-  height: 230px;
-  object-fit: cover;
+.card-img-top {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
-.product-card .info {
-  padding: 18px;
-}
-
-.product-card h5 {
-  color: #ff5da2;
-  font-weight: 600;
-}
-
-.product-card p {
-  color: #555;
-}
-
-/* ================== PRICE ================== */
-.price {
-  font-size: 18px;
-  font-weight: bold;
+/* ================= PRICE ================= */
+.fw-bold {
   color: #38d9a9;
+  font-size: 18px;
+  background: rgba(56,217,169,0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
 }
 
-/* ================== BUTTONS ================== */
+/* ================= BUTTONS ================= */
 .btn-primary {
   background: linear-gradient(90deg, #ff5da2, #38d9a9);
   border: none;
@@ -103,44 +125,58 @@ body {
   padding: 10px 22px;
   font-weight: 600;
   color: white;
-  transition: 0.3s ease;
+  transition: 0.3s;
 }
 
 .btn-primary:hover {
-  transform: scale(1.05);
-  background: linear-gradient(90deg, #38d9a9, #ff5da2);
+  transform: scale(1.1);
 }
 
-/* ================== SINGLE PRODUCT ================== */
+.btn-info {
+  background: linear-gradient(90deg, #38d9a9, #ff5da2);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  padding: 8px 18px;
+}
+
+.btn-info:hover {
+  box-shadow: 0 10px 25px rgba(255,93,162,0.5);
+}
+
+.btn-secondary {
+  background: linear-gradient(90deg, #ff5da2, #ff85b3);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+}
+
+/* ================= SINGLE PRODUCT ================= */
 .single-product {
-  background: white;
+  background: rgba(255,255,255,0.95);
   padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
 }
 
-/* ================== CART ================== */
+/* ================= CART ================= */
 .cart-table {
-  background: white;
+  background: rgba(255,255,255,0.95);
   padding: 25px;
   border-radius: 18px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
 }
 
-.cart-total {
-  font-size: 22px;
-  font-weight: 600;
-  text-align: right;
-  color: #38d9a9;
-}
-
+/* ================= FORMS ================= */
 .auth-form,
 .update-form,
 .admin-panel {
-  background: white;
+  background: rgba(255,255,255,0.95);
   padding: 35px;
   border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
 }
 
 input,
@@ -151,25 +187,15 @@ textarea {
   border-radius: 10px;
   border: 1px solid #ddd;
   margin-bottom: 18px;
-  transition: 0.3s;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #ff5da2;
-  box-shadow: 0 0 0 3px rgba(255,93,162,0.25);
-  outline: none;
-}
-
-/* ================== ADMIN MENU ================== */
+/* ================= ADMIN MENU ================= */
 .admin-menu a {
   display: block;
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 10px;
   color: #333;
-  font-weight: 500;
   transition: 0.3s;
 }
 
@@ -178,12 +204,107 @@ textarea:focus {
   color: white;
 }
 
-/* ================== RESPONSIVE ================== */
+/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   .products-grid {
     grid-template-columns: 1fr;
   }
-  .home-container {
-    padding: 20px;
-  }
+}
+
+
+
+.order-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+}
+
+.order-product {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+}
+
+.order-product img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.order-product-info h6 {
+  font-weight: 600;
+  color: #ff5da2;
+  margin-bottom: 5px;
+}
+
+.order-product-info p {
+  margin: 0;
+  color: #555;
+}
+
+/* Order Status */
+.order-status {
+  background: linear-gradient(90deg, #38d9a9, #ff5da2);
+  color: white;
+  padding: 6px 18px;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: 600;
+}
+.btn-info {
+  background: linear-gradient(90deg, #ff5da2, #38d9a9);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 30px;
+  transition: 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glow effect */
+.btn-info::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 60%);
+  opacity: 0;
+  transition: 0.4s;
+}
+
+.btn-info:hover::after {
+  opacity: 1;
+}
+
+.btn-info:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 30px rgba(255,93,162,0.6);
+}
+.btn-info {
+  background: linear-gradient(90deg, #4facfe, #6f42c1);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 30px;
+  transition: 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-info:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 30px rgba(111,66,193,0.6);
 }
