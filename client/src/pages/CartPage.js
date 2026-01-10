@@ -49,7 +49,17 @@ const CartPage = () => {
   // ============================
   const getToken = async () => {
     try {
-      const { data } = await axios.get("/api/v1/product/braintree/token");
+      const authData = JSON.parse(localStorage.getItem("auth"));
+
+      const { data } = await axios.get(
+        "/api/v1/product/braintree/token",
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
       setClientToken(data?.clientToken);
     } catch (error) {
       console.log(error);
@@ -69,7 +79,6 @@ const CartPage = () => {
 
       setLoading(true);
       const { nonce } = await instance.requestPaymentMethod();
-
       const authData = JSON.parse(localStorage.getItem("auth"));
 
       await axios.post(
@@ -152,6 +161,7 @@ const CartPage = () => {
                   options={{ authorization: clientToken }}
                   onInstance={(inst) => setInstance(inst)}
                 />
+
                 <button
                   className="btn btn-primary"
                   onClick={handlePayment}

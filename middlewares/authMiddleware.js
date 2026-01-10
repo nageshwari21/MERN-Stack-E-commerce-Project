@@ -4,20 +4,31 @@ import userModel from "../models/userModel.js";
 export const requireSignIn = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    const token = authHeader.split(" ")[1];
 
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send({ success: false, message: "No token" });
+    }
+
+    const token = authHeader.split(" ")[1];
     const decode = JWT.verify(token, process.env.JWT_SECRET);
-    req.user = decode; // {_id, role}
+
+    req.user = decode; // { _id, role }
     next();
-  } catch {
-    return res.status(401).json({ ok: false });
+  } catch (error) {
+    return res.status(401).send({ success: false, message: "Invalid token" });
   }
 };
 
 export const isAdmin = async (req, res, next) => {
-  const user = await userModel.findById(req.user._id);
-  if (!user || user.role !== 1) {
-    return res.status(403).json({ ok: false });
+  try {
+    const user = await userModel.findById(req.user._id);
+
+    if (!user || user.role !== 1) {
+      return res.status(403).send({ success: false, message: "Admin only" });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(403).send({ success: false, message: "Admin only" });
   }
-  next();
 };

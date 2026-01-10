@@ -10,7 +10,7 @@ import { useCart } from "../context/cart";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [cart, setCart] = useCart(); 
+  const [cart, setCart] = useCart();
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -52,9 +52,7 @@ const HomePage = () => {
   const getAllProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `/api/v1/product/product-list/${page}`
-      );
+      const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
       setProducts(data?.products || []);
       setLoading(false);
     } catch (error) {
@@ -69,9 +67,7 @@ const HomePage = () => {
   const loadMore = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `/api/v1/product/product-list/${page}`
-      );
+      const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
       setProducts((prev) => [...prev, ...(data?.products || [])]);
       setLoading(false);
     } catch (error) {
@@ -114,15 +110,18 @@ const HomePage = () => {
     getAllProducts();
   }, [getAllCategory, getTotal, getAllProducts]);
 
+  // load more
   useEffect(() => {
     if (page === 1) return;
     loadMore();
   }, [page, loadMore]);
 
+  // filters (DO NOT call getAllProducts here)
   useEffect(() => {
-    if (!checked.length && !radio.length) getAllProducts();
-    else filterProduct();
-  }, [checked, radio, filterProduct, getAllProducts]);
+    if (checked.length || radio.length) {
+      filterProduct();
+    }
+  }, [checked, radio, filterProduct]);
 
   // =========================
   // UI
@@ -130,6 +129,7 @@ const HomePage = () => {
   return (
     <Layout title="All Products - Best Offers">
       <div className="container-fluid row mt-3">
+
         {/* FILTER SECTION */}
         <div className="col-md-3">
           <h4 className="text-center">Filter By Category</h4>
@@ -159,7 +159,7 @@ const HomePage = () => {
           <h1 className="text-center">All Products</h1>
 
           <div className="d-flex flex-wrap">
-            {products.map((p) => (
+            {products?.map((p) => (
               <div
                 className="card m-2"
                 style={{ width: "18rem" }}
@@ -184,7 +184,6 @@ const HomePage = () => {
                     More Details
                   </button>
 
-                  {/* ✅ FIXED ADD TO CART */}
                   <button
                     className="btn btn-secondary ms-1"
                     onClick={() => {

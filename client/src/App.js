@@ -29,6 +29,7 @@ import CreateProduct from "./pages/Admin/CreateProduct";
 import Products from "./pages/Admin/Products";
 import UpdateProduct from "./pages/Admin/UpdateProduct";
 import User from "./pages/Admin/User";
+import AdminOrders from "./pages/Admin/AdminOrders";   // ✅ correct file
 
 /* Guards */
 import PrivateRoute from "./components/Routes/Private";
@@ -68,6 +69,9 @@ function App() {
         <Route path="products" element={<Products />} />
         <Route path="update-product/:id" element={<UpdateProduct />} />
         <Route path="users" element={<User />} />
+
+        {/* 🆕 ADMIN ORDERS */}
+        <Route path="orders" element={<AdminOrders />} />
       </Route>
 
       {/* 404 */}
