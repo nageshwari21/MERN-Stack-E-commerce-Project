@@ -8,37 +8,55 @@ import authRoutes from "./routes/authRoute.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Load env
 dotenv.config();
 connectDB();
 
 const app = express();
 
-/* =========================
-   DISABLE API CACHING (304 FIX)
-========================= */
+/* ================================
+   FIX __dirname FOR ES MODULE
+================================ */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* ================================
+   DISABLE CACHE (Avoid 304 errors)
+================================ */
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store");
   next();
 });
 
-/* =========================
-   MIDDLEWARES
-========================= */
+/* ================================
+   MIDDLEWARE
+================================ */
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-/* =========================
-   ROUTES
-========================= */
+/* ================================
+   API ROUTES
+================================ */
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 
-app.get("/", (req, res) => {
-  res.send("API running");
+/* ================================
+   SERVE REACT BUILD
+================================ */
+app.use(express.static(path.join(__dirname, "client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
+/* ================================
+   START SERVER
+================================ */
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
