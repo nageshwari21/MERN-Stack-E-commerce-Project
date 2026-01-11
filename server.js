@@ -7,6 +7,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoute.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";   // 👈 ADD THIS
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -24,7 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /* ================================
-   DISABLE CACHE (Avoid 304 errors)
+   DISABLE CACHE
 ================================ */
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store");
@@ -44,6 +45,7 @@ app.use(morgan("dev"));
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/ai", aiRoutes);   // 👈 AI route
 
 /* ================================
    SERVE REACT BUILD
@@ -58,7 +60,6 @@ app.get("*", (req, res) => {
    START SERVER
 ================================ */
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

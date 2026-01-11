@@ -10,8 +10,10 @@ const ProductDetails = () => {
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [aiRecommend, setAiRecommend] = useState([]); // 🔥 AI recommendations
   const [loading, setLoading] = useState(true);
 
+  // Load product
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -31,6 +33,7 @@ const ProductDetails = () => {
     if (slug) getProduct();
   }, [slug]);
 
+  // Load similar products
   const getSimilarProduct = async (pid, cid) => {
     try {
       const { data } = await axios.get(
@@ -41,6 +44,16 @@ const ProductDetails = () => {
       console.log(error);
     }
   };
+
+  // 🔥 Load AI Recommended Products
+  useEffect(() => {
+    if (product?._id) {
+      axios
+        .post("/api/v1/ai/recommend", { productId: product._id })
+        .then((res) => setAiRecommend(res.data))
+        .catch((err) => console.log("AI Error:", err));
+    }
+  }, [product]);
 
   if (loading) {
     return (
@@ -60,6 +73,7 @@ const ProductDetails = () => {
 
   return (
     <Layout title={product.name}>
+      {/* Product Details */}
       <div className="row container product-details">
         <div className="col-md-6">
           <img
@@ -80,12 +94,11 @@ const ProductDetails = () => {
 
       <hr />
 
+      {/* Similar Products */}
       <div className="row container similar-products">
         <h4>Similar Products</h4>
 
-        {relatedProducts.length === 0 && (
-          <p>No Similar Products Found</p>
-        )}
+        {relatedProducts.length === 0 && <p>No Similar Products Found</p>}
 
         <div className="d-flex flex-wrap">
           {relatedProducts.map((p) => (
@@ -103,6 +116,37 @@ const ProductDetails = () => {
                   onClick={() => navigate(`/product/${p.slug}`)}
                 >
                   More Details
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <hr />
+
+      {/* ✨ AI Recommended Products */}
+      <div className="row container similar-products">
+        <h4>✨ AI Recommended For You</h4>
+
+        {aiRecommend.length === 0 && <p>No AI recommendations yet</p>}
+
+        <div className="d-flex flex-wrap">
+          {aiRecommend.map((p) => (
+            <div className="card m-2" key={p._id}>
+              <img
+                src={`/api/v1/product/product-photo/${p._id}`}
+                alt={p.name}
+                className="card-img-top"
+              />
+              <div className="card-body">
+                <h5>{p.name}</h5>
+                <p>{p.description.substring(0, 50)}...</p>
+                <button
+                  className="btn btn-success"
+                  onClick={() => navigate(`/product/${p.slug}`)}
+                >
+                  View Product
                 </button>
               </div>
             </div>
