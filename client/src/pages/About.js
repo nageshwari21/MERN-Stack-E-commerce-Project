@@ -14,12 +14,15 @@ const About = () => {
         </div>
         <div className="col-md-4">
           <p className="text-justify mt-2">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-            officiis obcaecati esse tempore unde ratione, eveniet mollitia,
-            perferendis eius temporibus dicta blanditiis doloremque explicabo
-            quasi sunt vero optio cum aperiam vel consectetur! Laborum enim
-            accusantium atque, excepturi sapiente amet! Tenetur ducimus aut
-            commodi illum quidem neque tempora nam.
+            Welcome to our online store — a modern shopping platform designed to make your life easier.
+
+We provide a wide range of quality products at affordable prices, carefully selected to meet the needs of our customers. Our focus is on delivering reliable products, secure payments, and fast service so you can shop with confidence.
+
+We believe online shopping should be simple, safe, and enjoyable. That’s why we continuously improve our platform to offer a smooth and user-friendly experience.
+
+Customer satisfaction is our top priority, and we are committed to providing excellent service at every step of your shopping journey.
+
+Thank you for choosing us as your trusted shopping partner.
           </p>
         </div>
       </div>
