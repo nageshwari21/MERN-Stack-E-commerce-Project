@@ -62,7 +62,7 @@ MERN-Stack-E-commerce-Project
 
 Clone the repository
 
-git clone https://github.com/nageshwari21/MERN-Stack-E-commerce-Project.git
+git clone https://mern-stack-e-commerce-project-lddj.onrender.com
 cd MERN-Stack-E-commerce-Project
 
 
@@ -129,5 +129,6 @@ node server.js
 
 Nageshwari Ghongade
 GitHub: https://github.com/nageshwari21
+
 
 
